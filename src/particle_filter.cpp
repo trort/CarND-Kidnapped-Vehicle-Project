@@ -134,7 +134,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     p.weight = final_weight;
     updated_weights.push_back(final_weight);
   }
-  weights = updated_weights;
+  weights = std::move(updated_weights);
   //cout << "Update done" << endl;
 }
 
@@ -143,17 +143,14 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
   std::vector<Particle> resampled_particles;
-  std::vector<double> updated_weights;
   std::default_random_engine generator;
   std::discrete_distribution<int> weight_distribution(weights.begin(), weights.end());
   for(int i = 0; i < num_particles; ++i) {
     int index = weight_distribution(generator);
     Particle sample = particles[index];
     resampled_particles.push_back(sample);
-    updated_weights.push_back(sample.weight);
   }
-  particles = resampled_particles;
-  weights = updated_weights;
+  particles = std::move(resampled_particles);
   //cout << "Resample done" << endl;
 }
 
